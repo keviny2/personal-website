@@ -1,0 +1,54 @@
+---
+title: "Logistic Regression"
+excerpt: "Model binary outcomes"
+---
+
+<link rel="stylesheet" href="/assets/css/article.css">
+
+{% include mathjax.html %}
+
+Logistic Regression is a simple, yet powerful classification method. The question we will address in this article is: given a patient's temperature in Fahrenheit, determine if the patient has the flu or the common cold. Note that we are trying to predict a qualitative value (flu or cold) rather than quantitative (a number). Let us encode the two medical conditions as \(\{1,2\}\) for flu and cold respectively.
+
+<h1>Logistic Function and Log Odds</h1>
+In logistic regression, we model the probability of a patient having the flu given a temperature \(t\) with the <b>logistic function</b>,
+
+$$ Pr(Y=1\mid T=t) = \frac{e^{\beta_0+\beta_1t}}{1+e^{\beta_0+\beta_1t}}$$
+
+For convenience, let us define \(p(t)=Pr(Y=1\mid T=t)\). With a bit of algebra, we can obtain the <b>log odds</b> or <b>logit</b>,
+
+$$\log{\frac{p(t)}{1-p(t)}} = e^{\beta_0+\beta_1t}$$
+
+Using the log odds helps us interpret the relationship between \(\beta_1\) and \(T\). Specifically, increasing \(T\) by one unit changes the log odds (or logit) by \(\beta_1\). It is important to note that a one unit increase in \(T\) <em>does not</em> correspond to a \(\beta_1\) change in \(p(t)\). Rather, it depends on the current value of \(T\) since \(p(t)\) is a non-linear function.
+
+<h1>Estimating Regression Coefficients</h1>
+How do we estimate \(\beta_0\) and \(\beta_1\)? First, we need a dataset and typically a method known as <em>maximum likelihood</em> is used. In our case, a dataset would be a collection of different patient's temperatures and their respective medical conditions (flu or cold). Assume we have observations \(\{(t_1, y_1), (t_2, y_2) \ldots , (t_n, y_n)\}\) where \(t_i\) is patient \(i\)'s temperature and \(y_i \in \{1,2\}\) for flu and cold respectively. Then the likelihood function we want to maximize is,
+
+$$l(\beta_0,\beta_1)=\prod_{i:y_i=1} p(t_i) \prod_{i':y_{i'}=0}(1-p(t_i))$$
+
+The Newton-Raphson algorithm is one option for solving this optimization problem.
+
+<h1>Making Predictions</h1>
+After estimating the coefficients, we can compute probabilities using the following equation and plugging in the estimated \(\beta\)s,
+
+$$\hat{p}(t)=\frac{e^{\hat{\beta}_0+\hat{\beta}_1t}}{1+e^{\hat{\beta}_0+\hat{\beta}_1t}}$$
+
+For concreteness, let our estimated parameters for our logistic regression model to predict medical condition from temperature be \(\hat{\beta}_0=-29\), \(\hat{\beta}_1=.3\) and \(X=110\). The predicted probability of a patient having the flu given a temperature of 110 degrees Fahrenheit is,
+
+$$\hat{p}(X)=\frac{e^{-29+.3*110}}{1+e^{-29+.3*110}} = .98$$
+
+Based on our logistic regression model, the probability of him having the flu is 98%!
+
+<h1>Extensions to Multiple Predictors and Classes</h1>
+We can generalize our formulation to allow for multiple predictors. Let \(X\) denote the predictors and G the response. The updated logistic function and log odds are,
+
+$$\log{\frac{p(X)}{1-p(X)}} = \beta_0 + \beta_1X + \ldots + \beta_pX_p$$
+$$p(X)=\frac{e^{\beta_0+\beta_1X+\ldots + \beta_pX_p}}{1+e^{\beta_0+\beta_1X+\ldots +\beta_pX_p}}$$
+
+We can also extend logistic regression to allow for more than two classes. In this setting, each class is specified by its own log odds or logit transformation,
+
+\begin{align}
+    \log{\frac{Pr(G=1\mid X=x)}{Pr(G=K\mid X=x)}} & = \beta_{10}+\beta_1^Tx\\
+    \log{\frac{Pr(G=2\mid X=x)}{Pr(G=K\mid X=x)}} & = \beta_{20}+\beta_2^Tx\\
+    & \vdots\\
+    \log{\frac{Pr(G=K-1\mid X=x)}{Pr(G=K\mid X=x)}} & = \beta_{(K-1)0}+\beta_{K-1}^Tx\\
+\end{align}

@@ -1,6 +1,8 @@
 main:
   - title: "Posts"
     url: /posts/
+  - title: "Machine Learning"
+    url: /machine-learning/
   - title: "Categories"
     url: /categories/
   - title: "Tags"
